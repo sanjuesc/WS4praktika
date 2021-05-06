@@ -25,6 +25,7 @@ class eGela:
 
         metodo = 'POST'
         uri = "https://egela.ehu.eus/login/index.php"
+        datuak = {'username': username.get(), 'password': password.get()}
         print(datuak)
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
                      'Content-Length': str(len(datuak))}
@@ -96,14 +97,14 @@ class eGela:
         cookie = self._cookiea
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
                      'Content-Length': str(len(datuak)), "Cookie": cookie}
-        erantzuna = requests.request(metodoa, uri, data=datuak, headers=goiburuak, allow_redirects=False)
-        soup = BeautifulSoup(erantzuna.content, "html.parser")
-        ikasgaiak = soup.find_all("a", {"class": "ehu-visible"})
-        for x in ikasgaiak:  # web sistemak irakasgaiaren URI-a lortu
-            if ("Web Sistemak" in x):
-                uri = x["href"]
-                print("Web sistemak lortuta")
-                break
+        #erantzuna = requests.request(metodoa, uri, data=datuak, headers=goiburuak, allow_redirects=False)
+        #soup = BeautifulSoup(erantzuna.content, "html.parser")
+        #ikasgaiak = soup.find_all("a", {"class": "ehu-visible"})
+        #for x in ikasgaiak:  # web sistemak irakasgaiaren URI-a lortu
+        #    if ("Web Sistemak" in x):
+        #        uri = x["href"]
+        #        print("Web sistemak lortuta")
+        #        break
         uri = "https://egela.ehu.eus/course/view.php?id=42336&section=1" #goian lortutako uri azken sekzioan sartzen da eta hor soilik pdf 1 dago, beraz, eskuz sartu dut lehen sekzioaren uria
         erantzuna = requests.request(metodoa, uri, data=datuak, headers=goiburuak, allow_redirects=False)
         if (erantzuna.status_code == 200):
@@ -114,7 +115,7 @@ class eGela:
             for unekoa in divGuztiak:
                 if unekoa.find("img", {"src": "https://egela.ehu.eus/theme/image.php/fordson/core/1619589309/f/pdf"}):  # egelako elementuetatik, pdf bezala agertzen direnak bilatu
                     print(i)
-                    if i != 2: #hirugarren pdf-a ezberdin irekitzen da
+                    if i != 2: #hirugarren pdf-a ezberdin irekitzen da, momentuz ignoratuko du
                         print(unekoa)
                         uria = str(unekoa).split("onclick=\"window.open('")[1].split("\'")[0].replace("amp;", "")
                         metodoa = 'POST'
