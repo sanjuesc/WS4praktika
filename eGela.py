@@ -74,11 +74,9 @@ class eGela:
         popup.destroy()
 
         if erantzuna.status_code==200:
-            _cookiea = cookie
-            _login = 1
+            self._cookiea = cookie
+            self._login = 1
             self._root.destroy()
-            soup = BeautifulSoup(erantzuna.content, "html.parser")
-
         else:
             messagebox.showinfo("Alert Message", "Login incorrect!")
             print(erantzuna.status_code)
@@ -95,8 +93,7 @@ class eGela:
         print("\n##### 4. ESKAERA (Ikasgairen eGelako orrialde nagusia) #####")
         metodoa = 'POST'
         datuak = ""
-        global _cookiea
-        cookie = _cookiea
+        cookie = self._cookiea
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
                      'Content-Length': str(len(datuak)), "Cookie": cookie}
         erantzuna = requests.request(metodoa, uri, data=datuak, headers=goiburuak, allow_redirects=False)
@@ -105,11 +102,37 @@ class eGela:
         for x in ikasgaiak:  # web sistemak irakasgaiaren URI-a lortu
             if ("Web Sistemak" in x):
                 uri = x["href"]
+                print("Web sistemak lortuta")
                 break
+        uri = "https://egela.ehu.eus/course/view.php?id=42336&section=1" #goian lortutako uri azken sekzioan sartzen da eta hor soilik pdf 1 dago, beraz, eskuz sartu dut lehen sekzioaren uria
         erantzuna = requests.request(metodoa, uri, data=datuak, headers=goiburuak, allow_redirects=False)
+        if (erantzuna.status_code == 200):
+            print("Ikasgaiaren orria ondo lortu da")
+            soup = BeautifulSoup(erantzuna.content, "html.parser")
+            divGuztiak = soup.find_all("div", {"class": "activityinstance"})
+            i = 0
+            for unekoa in divGuztiak:
+                if unekoa.find("img", {"src": "https://egela.ehu.eus/theme/image.php/fordson/core/1619589309/f/pdf"}):  # egelako elementuetatik, pdf bezala agertzen direnak bilatu
+                    print(i)
+                    if i != 2: #hirugarren pdf-a ezberdin irekitzen da
+                        print(unekoa)
+                        uria = str(unekoa).split("onclick=\"window.open('")[1].split("\'")[0].replace("amp;", "")
+                        metodoa = 'POST'
+                        datuak = ""
+                        goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
+                                     'Content-Length': str(len(datuak)), "Cookie": cookie}
+                        erantzuna = requests.request(metodoa, uria, data=datuak, headers=goiburuak,
+                                                     allow_redirects=False)
+                        pdfURI = erantzuna.headers['Location']
+                        erantzuna = requests.request(metodoa, pdfURI, data=datuak, headers=goiburuak,
+                                                     allow_redirects=False)
+                        filename = pdfURI.split("mod_resource/content/")[1].split("/")[1].replace("%20", "_")
 
+                        self._refs.append({"Name": filename, "Uri": pdfURI})
+                    i = i+1
+
+        print("PDF kopurua " + str(len(self._refs)))
         progress_step = float(100.0 / len(self._refs))
-
         print("\n##### HTML-aren azterketa... #####")
         #############################################
         # ANALISIS DE LA PAGINA DEL AULA EN EGELA

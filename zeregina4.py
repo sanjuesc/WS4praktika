@@ -91,7 +91,7 @@ def create_folder():
     popup = tk.Toplevel(newroot)
     popup.geometry('200x100')
     popup.title('Dropbox')
-    popup.iconbitmap('./favicon.ico')
+    #popup.iconbitmap('./favicon.ico')
     helper.center(popup)
 
     login_frame = tk.Frame(popup, padx=10, pady=10)
@@ -160,6 +160,7 @@ button.pack(side=tk.BOTTOM)
 
 root.mainloop()
 
+print(egela._login)
 if not egela._login:
        exit()
 # eGela-ko PDF-etako erreferentziak hartu
@@ -168,7 +169,7 @@ pdfs = egela.get_pdf_refs()
 # Login Dropbox
 root = tk.Tk()
 root.geometry('250x100')
-root.iconbitmap('./favicon.ico')
+#root.iconbitmap('./favicon.ico')
 root.title('Login Dropbox')
 helper.center(root)
 
@@ -189,7 +190,7 @@ root.mainloop()
 
 newroot = tk.Tk()
 newroot.geometry("850x400")
-newroot.iconbitmap('./favicon.ico')
+#newroot.iconbitmap('./favicon.ico')
 newroot.title("eGela -> Dropbox")
 helper.center(newroot)
 
