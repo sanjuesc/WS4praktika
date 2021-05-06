@@ -112,29 +112,32 @@ class eGela:
             soup = BeautifulSoup(erantzuna.content, "html.parser")
             divGuztiak = soup.find_all("div", {"class": "activityinstance"})
             i = 0
-            for unekoa in divGuztiak:
-                if unekoa.find("img", {"src": "https://egela.ehu.eus/theme/image.php/fordson/core/1619589309/f/pdf"}):  # egelako elementuetatik, pdf bezala agertzen direnak bilatu
-                    print(i)
-                    if i != 2: #hirugarren pdf-a ezberdin irekitzen da, momentuz ignoratuko du
-                        print(unekoa)
-                        uria = str(unekoa).split("onclick=\"window.open('")[1].split("\'")[0].replace("amp;", "")
-                        metodoa = 'POST'
-                        datuak = ""
-                        goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                                     'Content-Length': str(len(datuak)), "Cookie": cookie}
-                        erantzuna = requests.request(metodoa, uria, data=datuak, headers=goiburuak,
-                                                     allow_redirects=False)
-                        pdfURI = erantzuna.headers['Location']
-                        erantzuna = requests.request(metodoa, pdfURI, data=datuak, headers=goiburuak,
-                                                     allow_redirects=False)
-                        filename = pdfURI.split("mod_resource/content/")[1].split("/")[1].replace("%20", "_")
+            luzeera = str(divGuztiak).count("pdf")-1 #hirugarren pdf-a ezberdin irekitzen da, momentuz ignoratuko du
 
-                        self._refs.append({"Name": filename, "Uri": pdfURI})
-                    i = i+1
 
-        print("PDF kopurua " + str(len(self._refs)))
-        progress_step = float(100.0 / len(self._refs))
+        print("PDF kopurua " + str(luzeera))        #print("PDF kopurua " + str(len(self._refs)))
+        progress_step = float(100.0 / luzeera)  #        progress_step = float(100.0 / len(self._refs))
         print("\n##### HTML-aren azterketa... #####")
+
+        for unekoa in divGuztiak:
+            if unekoa.find("img", {
+                "src": "https://egela.ehu.eus/theme/image.php/fordson/core/1619589309/f/pdf"}):  # egelako elementuetatik, pdf bezala agertzen direnak bilatu
+                if i != 2:  # hirugarren pdf-a ezberdin irekitzen da, momentuz ignoratuko du
+                    progress += progress_step
+                    progress_var.set(progress)
+                    progress_bar.update()
+                    time.sleep(0.1)
+                    uria = str(unekoa).split("onclick=\"window.open('")[1].split("\'")[0].replace("amp;", "")
+                    metodoa = 'POST'
+                    datuak = ""
+                    goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
+                                 'Content-Length': str(len(datuak)), "Cookie": cookie}
+                    erantzuna = requests.request(metodoa, uria, data=datuak, headers=goiburuak,
+                                                 allow_redirects=False)
+                    pdfURI = erantzuna.headers['Location']
+                    filename = pdfURI.split("mod_resource/content/")[1].split("/")[1].replace("%20", "_")
+                    self._refs.append({"Name": filename, "Uri": pdfURI})
+                i = i + 1
         #############################################
         # ANALISIS DE LA PAGINA DEL AULA EN EGELA
         # PARA BUSCAR PDFs
@@ -142,11 +145,9 @@ class eGela:
 
             # ACTUALIZAR BARRA DE PROGRESO
             # POR CADA PDF ANIADIDO EN self._refs
-        progress += progress_step
-        progress_var.set(progress)
-        progress_bar.update()
-        time.sleep(0.1)
 
+        for x in self._refs:
+            print(x)
         popup.destroy()
         return self._refs
 
