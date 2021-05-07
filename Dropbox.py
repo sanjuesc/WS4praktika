@@ -8,8 +8,8 @@ import webbrowser
 import json
 
 
-app_key = '7cx6l0haap3t6bl'
-app_secret = 'zvbdo7mr943nojn'
+app_key = ''
+app_secret = ''
 server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
@@ -58,8 +58,6 @@ class Dropbox:
     def do_oauth(self):
         print("do_oauth")
         scope = "https://www.googleapis.com/auth/calendar.readonly"
-        client_id = "628010651602-r9h58t2bldjv0v6rkgo2mvorfmkafcln.apps.googleusercontent.com"
-        client_secret = "pUCsxjN8J63LTF3mVWb6wmyi"
         uri = "https://accounts.google.com/o/oauth2/v2/auth"
         cabeceras = {'Host': 'accounts.google.com'}
         datos = {'client_id': client_id,
