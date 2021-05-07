@@ -49,6 +49,7 @@ class Dropbox:
         return auth_code
 
     def do_oauth(self):
+        print("do_oauth")
         #############################################
         # RELLENAR CON CODIGO DE LAS PETICIONES HTTP
         # Y PROCESAMIENTO DE LAS RESPUESTAS HTTP

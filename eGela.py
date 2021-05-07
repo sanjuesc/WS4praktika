@@ -136,7 +136,7 @@ class eGela:
                                                  allow_redirects=False)
                     pdfURI = erantzuna.headers['Location']
                     filename = pdfURI.split("mod_resource/content/")[1].split("/")[1].replace("%20", "_")
-                    self._refs.append({"Name": filename, "Uri": pdfURI})
+                    self._refs.append({"pdf_name": filename, "pdf_link": pdfURI})
                 i = i + 1
         #############################################
         # ANALISIS DE LA PAGINA DEL AULA EN EGELA
