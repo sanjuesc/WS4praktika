@@ -1,8 +1,15 @@
 from socket import AF_INET, socket, SOCK_STREAM
-import helper
 
-app_key = ''
-app_secret = ''
+import requests
+
+import helper
+import urllib
+import webbrowser
+import json
+
+
+app_key = '7cx6l0haap3t6bl'
+app_secret = 'zvbdo7mr943nojn'
 server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
@@ -31,7 +38,7 @@ class Dropbox:
         print (eskaera)
 
         # eskaeran "auth_code"-a bilatu
-        lehenengo_lerroa = eskaera.split('\n')[0]
+        lehenengo_lerroa = eskaera.decode("UTF8").split('\n')[0]
         aux_auth_code = lehenengo_lerroa.split(' ')[1]
         auth_code = aux_auth_code[7:].split('&')[0]
         print ("\tauth_code: " + auth_code)
@@ -42,7 +49,7 @@ class Dropbox:
                         "<head><title>Proba</title></head>" \
                         "<body>The authentication flow has completed. Close this window.</body>" \
                         "</html>"
-        client_connection.sendall(http_response)
+        client_connection.sendall(http_response.encode(encoding="utf-8"))
         client_connection.close()
         server_socket.close()
 
@@ -50,12 +57,39 @@ class Dropbox:
 
     def do_oauth(self):
         print("do_oauth")
-        #############################################
-        # RELLENAR CON CODIGO DE LAS PETICIONES HTTP
-        # Y PROCESAMIENTO DE LAS RESPUESTAS HTTP
-        # PARA LA OBTENCION DEL ACCESS TOKEN
-        #############################################
+        scope = "https://www.googleapis.com/auth/calendar.readonly"
+        client_id = "628010651602-r9h58t2bldjv0v6rkgo2mvorfmkafcln.apps.googleusercontent.com"
+        client_secret = "pUCsxjN8J63LTF3mVWb6wmyi"
+        uri = "https://accounts.google.com/o/oauth2/v2/auth"
+        cabeceras = {'Host': 'accounts.google.com'}
+        datos = {'client_id': client_id,
+                 'redirect_uri': redirect_uri,
+                 'response_type': 'code',
+                 'scope': scope}
+        datos_encoded = urllib.parse.urlencode(datos)
+        webbrowser.open_new((uri + '?' + datos_encoded))
+        auth_code = self.local_server()
+        uri = 'https://oauth2.googleapis.com/token'
+        cabeceras = {'Host': 'oauth2.googleapis.com',
+                     'Content-Type': 'application/x-www-form-urlencoded'}
+        datos = {'code': auth_code,
+                 'client_id': client_id,
+                 'client_secret': client_secret,
+                 'redirect_uri': redirect_uri,
+                 'grant_type': 'authorization_code'}
+        respuesta = requests.post(uri, headers=cabeceras, data=datos, allow_redirects=False)
+        status = respuesta.status_code
+        print("\tStatus: " + str(status))
 
+        # Google responds to this request by returning a JSON object
+        # that contains a short-lived access token and a refresh token.
+        contenido = respuesta.text
+        print("\tCotenido:")
+        print(contenido)
+        contenido_json = json.loads(contenido)
+        access_token = contenido_json['access_token']
+        print("\taccess_token: " + access_token)
+        self._access_token= access_token
         self._root.destroy()
 
     def list_folder(self, msg_listbox):
