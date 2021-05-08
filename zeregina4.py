@@ -108,6 +108,28 @@ def create_folder():
 
 ##########################################################################################################
 
+def open_pdf():
+    popup, progress_var, progress_bar = helper.progress("transfer_file", "Transfering files...")
+    progress = 0
+    progress_var.set(progress)
+    progress_bar.update()
+    progress_step = float(100.0 / len(selected_items1))
+
+    for each in selected_items1:
+        pdf_name, pdf_file = egela.get_pdf(each)
+
+        progress_bar.update()
+        newroot.update()
+        egela.download_pdf(pdf_name)
+
+        progress += progress_step
+        progress_var.set(progress)
+        progress_bar.update()
+        newroot.update()
+
+        time.sleep(0.1)
+    popup.destroy()
+
 def check_credentials(event= None):
     egela.check_credentials(username, password)
 
@@ -244,6 +266,8 @@ button2 = tk.Button(frame2, borderwidth=4, text="Delete", width=10, pady=8, comm
 button2.pack(padx=2, pady=2)
 button3 = tk.Button(frame2, borderwidth=4, text="Create folder", width=10, pady=8, command=create_folder)
 button3.pack(padx=2, pady=2)
+button4 = tk.Button(frame2, borderwidth=4, text="Open PDF", width=10, pady=8, command=open_pdf)
+button4.pack(padx=2, pady=2)
 frame2.grid(column=3, row=1, ipadx=10, ipady=10)
 
 for each in pdfs:
