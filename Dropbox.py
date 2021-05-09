@@ -8,8 +8,7 @@ from pip._vendor.distlib.compat import raw_input
 
 import helper
 
-app_key = ''
-app_secret = ''
+
 server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)

@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import helper
 import os
 
-cookie = ""
 
 class eGela:
     _login = 0
@@ -42,8 +41,8 @@ class eGela:
             uri = erantzuna.headers['Location']
             print("Location : " + uri)
         if "Set-Cookie" in erantzuna.headers:
-            cookie = erantzuna.headers["Set-Cookie"].split(';')[0]
-            print("Cookie : " + cookie)
+            self._cookiea = erantzuna.headers["Set-Cookie"].split(';')[0]
+            print("Cookie : " + self._cookiea)
 
         print(str(erantzuna.status_code) + " " + erantzuna.reason)
 
@@ -55,7 +54,7 @@ class eGela:
         print("\n##### 2. ESKAERA #####")
         print(uri)
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                     'Content-Length': str(len(datuak)), "Cookie": cookie}
+                     'Content-Length': str(len(datuak)), "Cookie": self._cookiea}
 
         edukia_encoded = urllib.parse.urlencode(datuak)
         goiburuak['Content-Length'] = str(len(edukia_encoded))
@@ -66,8 +65,7 @@ class eGela:
             uri = erantzuna.headers['Location']
             print("Location : " + uri)
         if "Set-Cookie" in erantzuna.headers:
-            cookie = erantzuna.headers["Set-Cookie"].split(';')[0]
-            print("Cookie : " + cookie)
+            self._cookiea = erantzuna.headers["Set-Cookie"].split(';')[0]
             datuak = ""
 
         print(str(erantzuna.status_code) + " " +erantzuna.reason)
@@ -80,7 +78,7 @@ class eGela:
         print("\n##### 3. ESKAERA #####")
         print(uri)
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                     'Content-Length': str(len(datuak)), "Cookie": cookie}
+                     'Content-Length': str(len(datuak)), "Cookie": self._cookiea}
 
         edukia_encoded = urllib.parse.urlencode(datuak)
         goiburuak['Content-Length'] = str(len(edukia_encoded))
@@ -89,7 +87,6 @@ class eGela:
 
         print(str(erantzuna.status_code) + " " + erantzuna.reason)
 
-        COMPROBACION_DE_LOG_IN = erantzuna.status_code == 200
 
         progress = 100
         progress_var.set(progress)
@@ -97,11 +94,8 @@ class eGela:
         time.sleep(0.1)
         popup.destroy()
 
-        if COMPROBACION_DE_LOG_IN:
+        if erantzuna.status_code == 200:
             self._login = 1
-            print(self._login)
-            self._cookiea = cookie
-            print(self._cookiea)
             self._root.destroy()
         else:
             messagebox.showinfo("Alert Message", "Login incorrect!")
@@ -116,9 +110,8 @@ class eGela:
         print("\n##### 4. ESKAERA (Ikasgairen eGelako orrialde nagusia) #####")
         metodo = 'POST'
         datuak = ""
-        cookie = self._cookiea
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                     'Content-Length': str(len(datuak)), "Cookie": cookie}
+                     'Content-Length': str(len(datuak)), "Cookie": self._cookiea}
 
         uri = "https://egela.ehu.eus/course/view.php?id=42336&section=1"  # goian lortutako uri azken sekzioan sartzen da eta hor soilik pdf 1 dago, beraz, eskuz sartu dut lehen sekzioaren uria
         erantzuna = requests.request(metodo, uri, data=datuak, headers=goiburuak, allow_redirects=False)
@@ -148,9 +141,8 @@ class eGela:
                 metodo = 'POST'
                 datuak = ""
                 goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                             'Content-Length': str(len(datuak)), "Cookie": cookie}
-                erantzuna = requests.request(metodo, uri, data=datuak, headers=goiburuak,
-                                             allow_redirects=False)
+                             'Content-Length': str(len(datuak)), "Cookie": self._cookiea}
+                erantzuna = requests.request(metodo, uri, data=datuak, headers=goiburuak, allow_redirects=False)
 
                 pdf_uri = erantzuna.headers['Location']
                 pdf_link = pdf_uri.split("mod_resource/content/")[1].split("/")[1].replace("%20", "_")
@@ -166,9 +158,9 @@ class eGela:
         pdf_name = self._refs[selection]['pdf_name']
         pdf_link = self._refs[selection]['pdf_link']
 
-        cookie = self._cookiea
+
         goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
-                     'Content-Length': '0', "Cookie": cookie}
+                     'Content-Length': '0', "Cookie": self._cookiea}
         erantzuna = requests.request('GET', pdf_link, headers=goiburuak, allow_redirects=False)
 
         pdf_file = erantzuna.content
