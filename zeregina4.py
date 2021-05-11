@@ -113,8 +113,24 @@ def open_pdf():
     progress = 0
     progress_var.set(progress)
     progress_bar.update()
-    progress_step = float(100.0 / len(selected_items1))
+    hutsik = False
+    if selected_items1 is None:
+        if selected_items2 is None:
+            hutsik = True
+        else:
+            progress_step = float(100.0 /len(selected_items2))
+            progress = eginLista2(popup, progress_var, progress_bar, progress_step, progress)
+    elif selected_items2 is None:
+        progress_step = float(100.0 / len(selected_items1))
+        progress = eginLista1(popup, progress_var, progress_bar, progress_step, progress)
+    else:
+        progress_step = float(100.0 / (len(selected_items1) + len(selected_items2)))
+        progress = eginLista1(popup, progress_var, progress_bar, progress_step, progress)
+        progress = eginLista2(popup, progress_var, progress_bar, progress_step, progress)
+    popup.destroy()
 
+
+def eginLista1(popup, progress_var, progress_bar, progress_step, progress):
     for each in selected_items1:
         pdf_name, pdf_file = egela.get_pdf(each)
 
@@ -128,7 +144,23 @@ def open_pdf():
         newroot.update()
 
         time.sleep(0.1)
-    popup.destroy()
+    return progress
+
+def eginLista2(popup, progress_var, progress_bar, progress_step, progress):
+    for each in selected_items2:
+        izena=dropbox._files[each]['name']
+        if dropbox._path == "/":
+            path = "/" + dropbox._files[each]['name']
+        else:
+            path = dropbox._path + "/" + dropbox._files[each]['name']
+        dropbox.download_links(path,izena)
+        progress += progress_step
+        progress_var.set(progress)
+        progress_bar.update()
+        newroot.update()
+        time.sleep(0.1)
+    return progress
+
 
 def check_credentials(event= None):
     egela.check_credentials(username, password)

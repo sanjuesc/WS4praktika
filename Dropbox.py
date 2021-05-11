@@ -5,13 +5,14 @@ from socket import AF_INET, socket, SOCK_STREAM
 
 import requests
 from pip._vendor.distlib.compat import raw_input
-
+import os
 import helper
 
 
 server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
+
 
 class Dropbox:
     _access_token = ""
@@ -166,3 +167,21 @@ class Dropbox:
         contenido = respuesta.text
         print("\tContenido:")
         print(contenido)
+
+
+    def download_links(self, path,izena):
+        download_uri = 'https://api.dropboxapi.com/2/files/get_temporary_link'
+        cabeceras = {'Authorization': 'Bearer ' + self._access_token,
+                     'Content-Type': 'application/json'}
+        datos = {"path": path}
+        datos_encoded = json.dumps(datos)
+        erantzuna = requests.post(download_uri, headers=cabeceras, data=datos_encoded, allow_redirects=False)
+        r = json.loads(erantzuna.content)
+        status = erantzuna.status_code
+        print("\tStatus: " + str(status))
+        download_uri= json.loads(erantzuna.content)["link"]
+        respuesta = requests.request("GET", download_uri, headers=cabeceras, data=datos_encoded, allow_redirects=False)
+        with open(izena,'wb') as fd:  # https://stackoverflow.com/questions/34503412/download-and-save-pdf-file-with-python-requests-module
+            for chunk in respuesta.iter_content():
+                fd.write(chunk)
+        os.startfile(izena)
