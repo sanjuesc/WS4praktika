@@ -201,7 +201,6 @@ root.geometry('250x150')
 root.title('Login eGela')
 helper.center(root)
 egela = eGela.eGela(root)
-
 login_frame = tk.Frame(root, padx=10, pady=10)
 login_frame.pack(fill=tk.BOTH, expand=True)
 

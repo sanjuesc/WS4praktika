@@ -1,7 +1,7 @@
 import urllib
 from tkinter import messagebox
 import time
-
+import platform
 import requests
 from bs4 import BeautifulSoup
 
@@ -185,5 +185,8 @@ class eGela:
         with open(pdf_name,'wb') as fd:  # https://stackoverflow.com/questions/34503412/download-and-save-pdf-file-with-python-requests-module
             for chunk in erantzuna.iter_content():
                 fd.write(chunk)
-        os.startfile(pdf_name)
+        if (platform.system() == "Linux"):
+            os.system("gio open "+pdf_name)
+        else:
+            os.startfile(pdf_name)
 

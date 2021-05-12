@@ -2,7 +2,7 @@ import json
 import urllib
 import webbrowser
 from socket import AF_INET, socket, SOCK_STREAM
-
+import platform
 import requests
 from pip._vendor.distlib.compat import raw_input
 import os
@@ -184,4 +184,7 @@ class Dropbox:
         with open(izena,'wb') as fd:  # https://stackoverflow.com/questions/34503412/download-and-save-pdf-file-with-python-requests-module
             for chunk in respuesta.iter_content():
                 fd.write(chunk)
-        os.startfile(izena)
+        if(platform.system()=="Linux"):
+            os.system("gio open "+izena)
+        else:
+            os.startfile(izena)
