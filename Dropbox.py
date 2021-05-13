@@ -4,10 +4,11 @@ import webbrowser
 from socket import AF_INET, socket, SOCK_STREAM
 import platform
 import requests
-from pip._vendor.distlib.compat import raw_input
 import os
 import helper
 
+app_key = ''
+app_secret = ''
 
 server_addr = "localhost"
 server_port = 8090
@@ -118,7 +119,7 @@ class Dropbox:
 
     def transfer_file(self, file_path, file_data):
         print("/upload " + file_path)
-
+        print(file_data)
         upload_uri = 'https://content.dropboxapi.com/2/files/upload'
         jsonupload = {
             "path": file_path,
@@ -130,8 +131,8 @@ class Dropbox:
         cabeceras = {'Authorization': 'Bearer ' + self._access_token,
                      'Content-Type': 'application/octet-stream',
                      'Dropbox-API-Arg': json.dumps(jsonupload)}
-        datos = {'data-binary': file_data}
-        respuesta = requests.post(upload_uri, headers=cabeceras, data=datos, allow_redirects=False)
+
+        respuesta = requests.post(upload_uri, headers=cabeceras, data=file_data, allow_redirects=False)
         status = respuesta.status_code
         print("\tStatus: " + str(status))
         contenido = respuesta.text
@@ -185,6 +186,6 @@ class Dropbox:
             for chunk in respuesta.iter_content():
                 fd.write(chunk)
         if(platform.system()=="Linux"):
-            os.system("gio open "+izena)
+            os.system("gio open "+izena + " &> /dev/null")
         else:
             os.startfile(izena)
